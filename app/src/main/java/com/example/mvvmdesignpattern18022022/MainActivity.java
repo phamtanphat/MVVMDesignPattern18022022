@@ -3,6 +3,7 @@ package com.example.mvvmdesignpattern18022022;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 
 import android.os.Bundle;
 import android.util.Log;
@@ -16,9 +17,9 @@ public class MainActivity extends AppCompatActivity {
     Button mBtnClick;
     TextView mTv;
     EditText mEdt;
-    String mText;
 //    MyService myService;
-    MyDatabase myDatabase;
+//    MyDatabase myDatabase;
+    MainViewModel mainViewModel;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,22 +48,23 @@ public class MainActivity extends AppCompatActivity {
         mTv = findViewById(R.id.textView);
         mEdt = findViewById(R.id.editText);
 
-        if (savedInstanceState != null){
-            String text = savedInstanceState.getString("text");
-            mTv.setText(text);
-        }
+        mainViewModel = new ViewModelProvider(this).get(MainViewModel.class);
+
+        mainViewModel.getText().observe(this, new Observer<String>() {
+            @Override
+            public void onChanged(String s) {
+                mTv.setText(s);
+            }
+        });
+
         mBtnClick.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mText = mEdt.getText().toString();
-                mTv.setText(mText);
+                String text = mEdt.getText().toString();
+                mainViewModel.updateText(text);
+                mTv.setText(text);
             }
         });
     }
 
-    @Override
-    protected void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putString("text",mText);
-    }
 }
